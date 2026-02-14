@@ -51,9 +51,17 @@
       box-shadow: 0 18px 60px rgba(0,0,0,.15);
     }
 
-    .art { width: min(260px, 80vw); margin: 0 auto 10px; display: block; filter: drop-shadow(0 10px 14px rgba(0,0,0,.12)); }
+    .art {
+      width: min(260px, 80vw);
+      margin: 0 auto 10px;
+      display: block;
+      filter: drop-shadow(0 10px 14px rgba(0,0,0,.12));
+    }
 
-    h1 { font-size: clamp(26px, 4vw, 44px); margin: 12px 0 18px; }
+    h1 {
+      font-size: clamp(26px, 4vw, 44px);
+      margin: 12px 0 18px;
+    }
 
     .button-zone {
       position: relative;
@@ -72,24 +80,31 @@
       font-weight: 800;
       border-radius: 999px;
       border: none;
-      cursor: pointer;
       box-shadow: 0 10px 24px rgba(0,0,0,.14);
       user-select: none;
       -webkit-tap-highlight-color: transparent;
-      transition: transform .12s ease, background .12s ease, left .16s ease, top .16s ease;
+      transition: transform .12s ease, background .12s ease, left .16s ease-out, top .16s ease-out;
     }
 
-    #yesBtn { left: 18%; background: var(--yes); color: #fff; }
+    #yesBtn {
+      left: 18%;
+      background: var(--yes);
+      color: #fff;
+    }
     #yesBtn:hover { background: var(--yesHover); }
 
     #noBtn {
       left: 62%;
       background: #e5e7eb;
       color: #111827;
-      pointer-events: none;           /* ← Дополнительная защита */
+      pointer-events: none;           /* курсор не меняется, клик не ловится */
     }
 
-    .hint { margin-top: 10px; font-size: 13px; opacity: .7; }
+    .hint {
+      margin-top: 10px;
+      font-size: 13px;
+      opacity: .7;
+    }
 
     .result {
       display: none;
@@ -98,7 +113,10 @@
       animation: pop .35s ease;
     }
 
-    .result h2 { font-size: clamp(30px, 4.5vw, 46px); margin: 10px 0; }
+    .result h2 {
+      font-size: clamp(30px, 4.5vw, 46px);
+      margin: 10px 0;
+    }
 
     .fireworks {
       width: min(380px, 90vw);
@@ -119,10 +137,15 @@
 
   <main class="card">
     <svg class="art" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
-      <!-- Твой SVG остаётся без изменений -->
       <defs>
-        <linearGradient id="fur" x1="0" x2="1"><stop offset="0" stop-color="#f7c7a1"/><stop offset="1" stop-color="#f2a97b"/></linearGradient>
-        <linearGradient id="heart" x1="0" x2="1"><stop offset="0" stop-color="#ff4d7d"/><stop offset="1" stop-color="#ff1f68"/></linearGradient>
+        <linearGradient id="fur" x1="0" x2="1">
+          <stop offset="0" stop-color="#f7c7a1"/>
+          <stop offset="1" stop-color="#f2a97b"/>
+        </linearGradient>
+        <linearGradient id="heart" x1="0" x2="1">
+          <stop offset="0" stop-color="#ff4d7d"/>
+          <stop offset="1" stop-color="#ff1f68"/>
+        </linearGradient>
       </defs>
       <path d="M250 50 C250 33 270 25 282 38 C294 25 314 33 314 50 C314 78 282 92 282 106 C282 92 250 78 250 50Z" fill="url(#heart)"/>
       <path d="M90 120 C90 70 140 40 190 60 C240 40 290 70 290 120 C290 180 240 210 190 210 C140 210 90 180 90 120Z" fill="url(#fur)"/>
@@ -180,15 +203,17 @@
       setTimeout(() => confettiInstance({ particleCount: 300, spread: 140, startVelocity: 60, ticks: 220, origin: { x: 0.5, y: 0.55 } }), 300);
     }
 
-    /* Yes Button Grow */
+    /* Yes grow */
     let yesScale = 1;
     function growYes() {
       yesScale = Math.min(2.2, yesScale + 0.1);
       yesBtn.style.transform = `translateY(-50%) scale(${yesScale})`;
     }
 
-    /* NO BUTTON LOGIC - MAIN FIX */
-    function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+    /* NO BUTTON — УЛУЧШЕННАЯ ЛОГИКА */
+    function clamp(n, min, max) {
+      return Math.max(min, Math.min(max, n));
+    }
 
     function moveNo(px, py) {
       const z = zone.getBoundingClientRect();
@@ -196,39 +221,46 @@
 
       const currLeft = b.left - z.left;
       const currTop  = b.top  - z.top;
+      const centerX  = currLeft + b.width / 2;
+      const centerY  = currTop  + b.height / 2;
 
-      let dx = (b.left + b.width/2) - px;
-      let dy = (b.top  + b.height/2) - py;
+      let dx = centerX - px;
+      let dy = centerY - py;
       let mag = Math.hypot(dx, dy) || 1;
-      dx /= mag; dy /= mag;
+      dx /= mag;
+      dy /= mag;
 
-      let newLeft = currLeft + dx * 190;
-      let newTop  = currTop  + dy * 190;
+      // Сила отталкивания зависит от расстояния
+      let push = 190;
+      if (mag < 70) push = 260;           // очень близко → очень сильно отталкивает
+      else if (mag < 130) push = 220;
 
-      // === TELEPORT В ПРОТИВОПОЛОЖНЫЙ УГОЛ ===
-      const edge = 35;
-      if (mag < 175) {
-        const nearLeft   = currLeft <= edge;
-        const nearRight  = currLeft >= z.width - b.width - edge;
-        const nearTop    = currTop  <= edge;
-        const nearBottom = currTop  >= z.height - b.height - edge;
+      let newLeft = currLeft + dx * push;
+      let newTop  = currTop  + dy * push;
 
-        if (nearLeft || nearRight || nearTop || nearBottom) {
-          if (nearLeft)   newLeft = z.width - b.width - 25;
-          if (nearRight)  newLeft = 25;
-          if (nearTop)    newTop  = z.height - b.height - 25;
-          if (nearBottom) newTop  = 25;
+      // Зеркальный телепорт, если прижата к краю и курсор близко
+      const edge = 40;
+      const nearL = currLeft <= edge;
+      const nearR = currLeft >= z.width - b.width - edge;
+      const nearT = currTop  <= edge;
+      const nearB = currTop  >= z.height - b.height - edge;
 
-          // Диагональные углы
-          if (nearLeft && nearTop)     { newLeft = z.width - b.width - 25; newTop = z.height - b.height - 25; }
-          if (nearRight && nearTop)    { newLeft = 25; newTop = z.height - b.height - 25; }
-          if (nearLeft && nearBottom)  { newLeft = z.width - b.width - 25; newTop = 25; }
-          if (nearRight && nearBottom) { newLeft = 25; newTop = 25; }
-        }
+      if (mag < 170 && (nearL || nearR || nearT || nearB)) {
+        if (nearL)   newLeft = z.width  - b.width - currLeft - 15;
+        if (nearR)   newLeft = z.width  - b.width - (z.width - b.width - currLeft) + 15;
+        if (nearT)   newTop  = z.height - b.height - currTop  - 15;
+        if (nearB)   newTop  = z.height - b.height - (z.height - b.height - currTop) + 15;
+
+        // Углы — диагональный зеркальный прыжок
+        if (nearL && nearT) { newLeft = z.width - b.width - currLeft - 15; newTop = z.height - b.height - currTop - 15; }
+        if (nearR && nearT) { newLeft = 15; newTop = z.height - b.height - currTop - 15; }
+        if (nearL && nearB) { newLeft = z.width - b.width - currLeft - 15; newTop = 15; }
+        if (nearR && nearB) { newLeft = 15; newTop = 15; }
       }
 
-      newLeft = clamp(newLeft, 0, z.width - b.width);
-      newTop  = clamp(newTop,  0, z.height - b.height);
+      // Не даём прилипать к самому краю
+      newLeft = clamp(newLeft, 25, z.width - b.width - 25);
+      newTop  = clamp(newTop,  25, z.height - b.height - 25);
 
       noBtn.style.left = newLeft + "px";
       noBtn.style.top  = newTop  + "px";
@@ -252,7 +284,7 @@
       return false;
     });
 
-    /* Yes Click */
+    /* Yes click */
     yesBtn.addEventListener("click", () => {
       zone.style.display = "none";
       hint.style.display = "none";
