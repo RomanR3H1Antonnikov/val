@@ -111,7 +111,7 @@
     .result {
       display: none;
       margin-top: 18px;
-      margin-bottom: 40px;       /* ← Отступ снизу, чтобы текст не прилипал */
+      margin-bottom: 40px;
       animation: pop .35s ease;
     }
 
@@ -122,7 +122,7 @@
 
     .fireworks {
       width: min(380px, 90vw);
-      max-width: 100%;           /* ← Чтобы видео не вылезало за экран */
+      max-width: 100%;
       height: auto;
       margin: 0 auto;
       display: block;
@@ -185,7 +185,7 @@
     </section>
 
     <!-- HINT -->
-    <div class="hint" id="hint">«Нет» стесняется, да? 😏</div>
+    <div class="hint" id="hint">Отказы не принимаются.</div>
 
     <section class="result" id="result">
       <h2>УРА! (Изи, я и не сомневался) 🎉</h2>
@@ -196,7 +196,7 @@
         muted 
         playsinline 
         src="https://i.imgur.com/sKfKiM5.mp4"
-        alt="Наш фейерверк любви"
+        alt="Милая гифка"
         width="100%"
         height="auto"
       ></video>
@@ -312,10 +312,9 @@
       resizeConfettiCanvas();
       fullScreenConfetti();
 
-      // Запускаем видео после клика (важно для Safari)
       const video = document.querySelector('.fireworks');
       if (video) {
-        video.play().catch(() => {});  // Игнорируем ошибку, если autoplay заблокирован
+        video.play().catch(() => {});
       }
     });
   </script>
