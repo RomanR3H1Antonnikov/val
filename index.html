@@ -85,7 +85,7 @@
       box-shadow: 0 10px 24px rgba(0,0,0,.14);
       user-select: none;
       -webkit-tap-highlight-color: transparent;
-      transition: transform .12s ease, background .12s ease;
+      transition: transform .12s ease, background .12s ease, left .18s ease, top .18s ease;
     }
 
     #yesBtn {
@@ -182,7 +182,7 @@
       <button id="noBtn">Нет</button>
     </section>
 
-    <div class="hint" id="hint">Отказы не принимаются!!</div>
+    <div class="hint" id="hint">«Нет» стесняется, да? 😏</div>
 
     <section class="result" id="result">
       <h2>УРА! (Изи, я и не сомневался) 🎉</h2>
@@ -193,7 +193,7 @@
         muted 
         playsinline 
         src="https://i.imgur.com/sKfKiM5.mp4"
-        alt="Милая гифка"
+        alt="Наш фейерверк любви"
         width="100%"
         height="auto"
       ></video>
@@ -262,7 +262,7 @@
       yesBtn.style.transform = `translateY(-50%) scale(${yesScale})`;
     }
 
-    /* ---------- NO BUTTON RUNS AWAY ---------- */
+    /* ---------- NO BUTTON RUNS AWAY / TELEPORT ---------- */
     function clamp(n, min, max) {
       return Math.max(min, Math.min(max, n));
     }
@@ -277,21 +277,49 @@
       dx /= mag;
       dy /= mag;
 
-      let newLeft = (b.left - z.left) + dx * 220;
-      let newTop  = (b.top - z.top) + dy * 220;
+      // Обычное отталкивание
+      let newLeft = (b.left - z.left) + dx * 180;
+      let newTop  = (b.top - z.top) + dy * 180;
 
+      // Проверяем, прижата ли кнопка к краю (в пределах 30 px)
+      const edge = 30;
+      const currLeft = b.left - z.left;
+      const currTop  = b.top - z.top;
+      const isNearLeft   = currLeft <= edge;
+      const isNearRight  = currLeft >= z.width - b.width - edge;
+      const isNearTop    = currTop  <= edge;
+      const isNearBottom = currTop  >= z.height - b.height - edge;
+
+      // Если прижата к краю И курсор всё ещё близко → телепорт в противоположный угол
+      if ((isNearLeft || isNearRight || isNearTop || isNearBottom) && mag < 140) {
+        // Телепорт в противоположный угол
+        if (isNearLeft)   newLeft = z.width - b.width - 20;   // вправо
+        if (isNearRight)  newLeft = 20;                       // влево
+        if (isNearTop)    newTop  = z.height - b.height - 20; // вниз
+        if (isNearBottom) newTop  = 20;                       // вверх
+
+        // Если прижата к двум краям сразу (угол) — выбираем диагонально противоположный
+        if (isNearLeft && isNearTop) {
+          newLeft = z.width - b.width - 20;
+          newTop  = z.height - b.height - 20;
+        }
+        if (isNearRight && isNearTop) {
+          newLeft = 20;
+          newTop  = z.height - b.height - 20;
+        }
+        if (isNearLeft && isNearBottom) {
+          newLeft = z.width - b.width - 20;
+          newTop  = 20;
+        }
+        if (isNearRight && isNearBottom) {
+          newLeft = 20;
+          newTop  = 20;
+        }
+      }
+
+      // Ограничиваем зону
       newLeft = clamp(newLeft, 0, z.width - b.width);
       newTop  = clamp(newTop, 0, z.height - b.height);
-
-      const minMove = 40;
-      const oldLeft = b.left - z.left;
-      const oldTop = b.top - z.top;
-      if (Math.abs(newLeft - oldLeft) < minMove && Math.abs(newTop - oldTop) < minMove) {
-        newLeft += (Math.random() - 0.5) * 140;
-        newTop  += (Math.random() - 0.5) * 140;
-        newLeft = clamp(newLeft, 0, z.width - b.width);
-        newTop  = clamp(newTop, 0, z.height - b.height);
-      }
 
       noBtn.style.left = newLeft + "px";
       noBtn.style.top = newTop + "px";
@@ -311,7 +339,6 @@
 
     noBtn.addEventListener("click", e => {
       e.preventDefault();
-      e.stopPropagation();
       return false;
     });
 
