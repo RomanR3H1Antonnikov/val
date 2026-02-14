@@ -99,6 +99,7 @@
       left: 62%;
       background: #e5e7eb;
       color: #111827;
+      pointer-events: none;  /* ← Делаем клик сквозь кнопку */
     }
 
     .hint {
@@ -182,7 +183,7 @@
       <button id="noBtn">Нет</button>
     </section>
 
-    <div class="hint" id="hint">Отказ не принимается.</div>
+    <div class="hint" id="hint">Отказы не принимаются!!</div>
 
     <section class="result" id="result">
       <h2>УРА! (Изи, я и не сомневался) 🎉</h2>
@@ -193,7 +194,7 @@
         muted 
         playsinline 
         src="https://i.imgur.com/sKfKiM5.mp4"
-        alt="Наш фейерверк любви"
+        alt="Милая гифка"
         width="100%"
         height="auto"
       ></video>
@@ -262,7 +263,7 @@
       yesBtn.style.transform = `translateY(-50%) scale(${yesScale})`;
     }
 
-    /* ---------- NO BUTTON RUNS AWAY / MIRROR TELEPORT ---------- */
+    /* ---------- NO BUTTON RUNS AWAY / TELEPORT ---------- */
     function clamp(n, min, max) {
       return Math.max(min, Math.min(max, n));
     }
@@ -272,7 +273,7 @@
       const b = noBtn.getBoundingClientRect();
 
       const currLeft = b.left - z.left;
-      const currTop  = b.top - z.top;
+      const currTop = b.top - z.top;
       const centerX = currLeft + b.width / 2;
       const centerY = currTop + b.height / 2;
 
@@ -282,57 +283,25 @@
       dx /= mag;
       dy /= mag;
 
-      // Обычное отталкивание
-      let newLeft = currLeft + dx * 180;
-      let newTop  = currTop + dy * 180;
+      let newLeft = currLeft + dx * 220;  // Агрессивнее отталкивание
+      let newTop = currTop + dy * 220;
 
-      // Порог близости к краю
+      // Порог для края и приближения
       const edge = 30;
+      const nearLeft = currLeft <= edge;
+      const nearRight = currLeft >= z.width - b.width - edge;
+      const nearTop = currTop <= edge;
+      const nearBottom = currTop >= z.height - b.height - edge;
 
-      // Проверяем, прижата ли кнопка к краю
-      const nearLeft   = currLeft <= edge;
-      const nearRight  = currLeft >= z.width - b.width - edge;
-      const nearTop    = currTop  <= edge;
-      const nearBottom = currTop  >= z.height - b.height - edge;
-
-      // Телепорт ТОЛЬКО если кнопка прижата к краю И курсор приближается
-      if (mag < 140 && (nearLeft || nearRight || nearTop || nearBottom)) {
-        // Зеркальное отражение по центру зоны
-        if (nearLeft) {
-          newLeft = z.width - b.width - currLeft;  // зеркально справа
-        }
-        if (nearRight) {
-          newLeft = z.width - b.width - (z.width - b.width - currLeft); // зеркально слева
-        }
-        if (nearTop) {
-          newTop = z.height - b.height - currTop;  // зеркально снизу
-        }
-        if (nearBottom) {
-          newTop = z.height - b.height - (z.height - b.height - currTop); // зеркально сверху
-        }
-
-        // Если в углу — зеркально по диагонали (оба измерения)
-        if (nearLeft && nearTop) {
-          newLeft = z.width - b.width - currLeft;
-          newTop  = z.height - b.height - currTop;
-        }
-        if (nearRight && nearTop) {
-          newLeft = z.width - b.width - (z.width - b.width - currLeft);
-          newTop  = z.height - b.height - currTop;
-        }
-        if (nearLeft && nearBottom) {
-          newLeft = z.width - b.width - currLeft;
-          newTop  = z.height - b.height - (z.height - b.height - currTop);
-        }
-        if (nearRight && nearBottom) {
-          newLeft = z.width - b.width - (z.width - b.width - currLeft);
-          newTop  = z.height - b.height - (z.height - b.height - currTop);
-        }
+      // Телепорт, если прижата и курсор близко
+      if (mag < 200 && (nearLeft || nearRight || nearTop || nearBottom)) {
+        // Зеркальный телепорт
+        newLeft = nearLeft ? (z.width - b.width - currLeft) : nearRight ? (z.width - b.width - (z.width - b.width - currLeft)) : newLeft;
+        newTop = nearTop ? (z.height - b.height - currTop) : nearBottom ? (z.height - b.height - (z.height - b.height - currTop)) : newTop;
       }
 
-      // Ограничиваем зону
       newLeft = clamp(newLeft, 0, z.width - b.width);
-      newTop  = clamp(newTop, 0, z.height - b.height);
+      newTop = clamp(newTop, 0, z.height - b.height);
 
       noBtn.style.left = newLeft + "px";
       noBtn.style.top = newTop + "px";
@@ -347,11 +316,12 @@
         (b.left + b.width / 2) - e.clientX,
         (b.top + b.height / 2) - e.clientY
       );
-      if (d < 140) moveNo(e.clientX, e.clientY);
+      if (d < 200) moveNo(e.clientX, e.clientY);  // Больший радиус
     });
 
     noBtn.addEventListener("click", e => {
       e.preventDefault();
+      e.stopPropagation();
       return false;
     });
 
