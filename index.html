@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Будешь моей валентинкой?</title>
 
-  <!-- Confetti library -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
   <style>
@@ -52,17 +51,9 @@
       box-shadow: 0 18px 60px rgba(0,0,0,.15);
     }
 
-    .art {
-      width: min(260px, 80vw);
-      margin: 0 auto 10px;
-      display: block;
-      filter: drop-shadow(0 10px 14px rgba(0,0,0,.12));
-    }
+    .art { width: min(260px, 80vw); margin: 0 auto 10px; display: block; filter: drop-shadow(0 10px 14px rgba(0,0,0,.12)); }
 
-    h1 {
-      font-size: clamp(26px, 4vw, 44px);
-      margin: 12px 0 18px;
-    }
+    h1 { font-size: clamp(26px, 4vw, 44px); margin: 12px 0 18px; }
 
     .button-zone {
       position: relative;
@@ -85,28 +76,20 @@
       box-shadow: 0 10px 24px rgba(0,0,0,.14);
       user-select: none;
       -webkit-tap-highlight-color: transparent;
-      transition: transform .12s ease, background .12s ease, left .18s ease, top .18s ease;
+      transition: transform .12s ease, background .12s ease, left .16s ease, top .16s ease;
     }
 
-    #yesBtn {
-      left: 18%;
-      background: var(--yes);
-      color: #fff;
-    }
+    #yesBtn { left: 18%; background: var(--yes); color: #fff; }
     #yesBtn:hover { background: var(--yesHover); }
 
     #noBtn {
       left: 62%;
       background: #e5e7eb;
       color: #111827;
-      pointer-events: none;  /* ← Делаем клик сквозь кнопку */
+      pointer-events: none;           /* ← Дополнительная защита */
     }
 
-    .hint {
-      margin-top: 10px;
-      font-size: 13px;
-      opacity: .7;
-    }
+    .hint { margin-top: 10px; font-size: 13px; opacity: .7; }
 
     .result {
       display: none;
@@ -115,10 +98,7 @@
       animation: pop .35s ease;
     }
 
-    .result h2 {
-      font-size: clamp(30px, 4.5vw, 46px);
-      margin: 10px 0;
-    }
+    .result h2 { font-size: clamp(30px, 4.5vw, 46px); margin: 10px 0; }
 
     .fireworks {
       width: min(380px, 90vw);
@@ -134,46 +114,23 @@
     }
   </style>
 </head>
-
 <body>
   <canvas id="confettiCanvas"></canvas>
 
   <main class="card">
     <svg class="art" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
+      <!-- Твой SVG остаётся без изменений -->
       <defs>
-        <linearGradient id="fur" x1="0" x2="1">
-          <stop offset="0" stop-color="#f7c7a1"/>
-          <stop offset="1" stop-color="#f2a97b"/>
-        </linearGradient>
-        <linearGradient id="heart" x1="0" x2="1">
-          <stop offset="0" stop-color="#ff4d7d"/>
-          <stop offset="1" stop-color="#ff1f68"/>
-        </linearGradient>
+        <linearGradient id="fur" x1="0" x2="1"><stop offset="0" stop-color="#f7c7a1"/><stop offset="1" stop-color="#f2a97b"/></linearGradient>
+        <linearGradient id="heart" x1="0" x2="1"><stop offset="0" stop-color="#ff4d7d"/><stop offset="1" stop-color="#ff1f68"/></linearGradient>
       </defs>
-
-      <path d="M250 50 C250 33 270 25 282 38
-               C294 25 314 33 314 50
-               C314 78 282 92 282 106
-               C282 92 250 78 250 50Z"
-            fill="url(#heart)"/>
-
-      <path d="M90 120 C90 70 140 40 190 60
-               C240 40 290 70 290 120
-               C290 180 240 210 190 210
-               C140 210 90 180 90 120Z"
-            fill="url(#fur)"/>
-
+      <path d="M250 50 C250 33 270 25 282 38 C294 25 314 33 314 50 C314 78 282 92 282 106 C282 92 250 78 250 50Z" fill="url(#heart)"/>
+      <path d="M90 120 C90 70 140 40 190 60 C240 40 290 70 290 120 C290 180 240 210 190 210 C140 210 90 180 90 120Z" fill="url(#fur)"/>
       <path d="M110 92 L95 55 L140 78 Z" fill="#f2a97b"/>
       <path d="M270 92 L285 55 L240 78 Z" fill="#f2a97b"/>
-
       <circle cx="160" cy="130" r="8"/>
       <circle cx="220" cy="130" r="8"/>
-
-      <path d="M190 144 C186 144 182 148 182 152
-               C182 160 190 164 190 170
-               C190 164 198 160 198 152
-               C198 148 194 144 190 144Z"
-            fill="#ff7aa2"/>
+      <path d="M190 144 C186 144 182 148 182 152 C182 160 190 164 190 170 C190 164 198 160 198 152 C198 148 194 144 190 144Z" fill="#ff7aa2"/>
     </svg>
 
     <h1>Алисочка, будешь моей валентинкой? ❤️</h1>
@@ -183,24 +140,12 @@
       <button id="noBtn">Нет</button>
     </section>
 
-    <div class="hint" id="hint">Отказы не принимаются!!</div>
+    <div class="hint" id="hint">Отказ не принимается.</div>
 
     <section class="result" id="result">
       <h2>УРА! (Изи, я и не сомневался) 🎉</h2>
-      <video 
-        class="fireworks" 
-        autoplay 
-        loop 
-        muted 
-        playsinline 
-        src="https://i.imgur.com/sKfKiM5.mp4"
-        alt="Милая гифка"
-        width="100%"
-        height="auto"
-      ></video>
-      <p style="margin-top: 20px; font-size: 18px; opacity: 0.9;">
-        От Ромы 💌 14.02.2026
-      </p>
+      <video class="fireworks" autoplay loop muted playsinline src="https://i.imgur.com/sKfKiM5.mp4" alt="Милая гифка" width="100%" height="auto"></video>
+      <p style="margin-top: 20px; font-size: 18px; opacity: 0.9;">От Ромы 💌 14.02.2026</p>
     </section>
   </main>
 
@@ -211,9 +156,8 @@
     const result = document.getElementById("result");
     const hint = document.getElementById("hint");
 
-    /* ---------- CONFETTI ---------- */
+    /* Confetti */
     const confettiCanvas = document.getElementById("confettiCanvas");
-
     function resizeConfettiCanvas() {
       const dpr = Math.max(1, window.devicePixelRatio || 1);
       confettiCanvas.width = Math.floor(window.innerWidth * dpr);
@@ -221,90 +165,73 @@
       confettiCanvas.style.width = "100vw";
       confettiCanvas.style.height = "100vh";
     }
-
     resizeConfettiCanvas();
     window.addEventListener("resize", resizeConfettiCanvas);
     window.addEventListener("orientationchange", () => setTimeout(resizeConfettiCanvas, 150));
 
-    const confettiInstance = confetti.create(confettiCanvas, {
-      resize: false,
-      useWorker: true
-    });
+    const confettiInstance = confetti.create(confettiCanvas, { resize: false, useWorker: true });
 
     function fullScreenConfetti() {
       const end = Date.now() + 1600;
-
       (function frame() {
-        confettiInstance({
-          particleCount: 12,
-          spread: 90,
-          startVelocity: 45,
-          ticks: 180,
-          origin: { x: Math.random(), y: Math.random() * 0.3 }
-        });
+        confettiInstance({ particleCount: 12, spread: 90, startVelocity: 45, ticks: 180, origin: { x: Math.random(), y: Math.random() * 0.3 } });
         if (Date.now() < end) requestAnimationFrame(frame);
       })();
-
-      setTimeout(() => {
-        confettiInstance({
-          particleCount: 300,
-          spread: 140,
-          startVelocity: 60,
-          ticks: 220,
-          origin: { x: 0.5, y: 0.55 }
-        });
-      }, 300);
+      setTimeout(() => confettiInstance({ particleCount: 300, spread: 140, startVelocity: 60, ticks: 220, origin: { x: 0.5, y: 0.55 } }), 300);
     }
 
-    /* ---------- YES BUTTON GROWS ---------- */
+    /* Yes Button Grow */
     let yesScale = 1;
     function growYes() {
       yesScale = Math.min(2.2, yesScale + 0.1);
       yesBtn.style.transform = `translateY(-50%) scale(${yesScale})`;
     }
 
-    /* ---------- NO BUTTON RUNS AWAY / TELEPORT ---------- */
-    function clamp(n, min, max) {
-      return Math.max(min, Math.min(max, n));
-    }
+    /* NO BUTTON LOGIC - MAIN FIX */
+    function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
 
     function moveNo(px, py) {
       const z = zone.getBoundingClientRect();
       const b = noBtn.getBoundingClientRect();
 
       const currLeft = b.left - z.left;
-      const currTop = b.top - z.top;
-      const centerX = currLeft + b.width / 2;
-      const centerY = currTop + b.height / 2;
+      const currTop  = b.top  - z.top;
 
-      let dx = centerX - px;
-      let dy = centerY - py;
+      let dx = (b.left + b.width/2) - px;
+      let dy = (b.top  + b.height/2) - py;
       let mag = Math.hypot(dx, dy) || 1;
-      dx /= mag;
-      dy /= mag;
+      dx /= mag; dy /= mag;
 
-      let newLeft = currLeft + dx * 220;
-      let newTop = currTop + dy * 220;
+      let newLeft = currLeft + dx * 190;
+      let newTop  = currTop  + dy * 190;
 
-      // Порог для края и приближения
-      const edge = 30;
-      const nearLeft = currLeft <= edge;
-      const nearRight = currLeft >= z.width - b.width - edge;
-      const nearTop = currTop <= edge;
-      const nearBottom = currTop >= z.height - b.height - edge;
+      // === TELEPORT В ПРОТИВОПОЛОЖНЫЙ УГОЛ ===
+      const edge = 35;
+      if (mag < 175) {
+        const nearLeft   = currLeft <= edge;
+        const nearRight  = currLeft >= z.width - b.width - edge;
+        const nearTop    = currTop  <= edge;
+        const nearBottom = currTop  >= z.height - b.height - edge;
 
-      // Телепорт, если прижата и курсор близко
-      if (mag < 200 && (nearLeft || nearRight || nearTop || nearBottom)) {
-        // Зеркальный телепорт
-        newLeft = nearLeft ? (z.width - b.width - currLeft) : nearRight ? (z.width - b.width - (z.width - b.width - currLeft)) : newLeft;
-        newTop = nearTop ? (z.height - b.height - currTop) : nearBottom ? (z.height - b.height - (z.height - b.height - currTop)) : newTop;
+        if (nearLeft || nearRight || nearTop || nearBottom) {
+          if (nearLeft)   newLeft = z.width - b.width - 25;
+          if (nearRight)  newLeft = 25;
+          if (nearTop)    newTop  = z.height - b.height - 25;
+          if (nearBottom) newTop  = 25;
+
+          // Диагональные углы
+          if (nearLeft && nearTop)     { newLeft = z.width - b.width - 25; newTop = z.height - b.height - 25; }
+          if (nearRight && nearTop)    { newLeft = 25; newTop = z.height - b.height - 25; }
+          if (nearLeft && nearBottom)  { newLeft = z.width - b.width - 25; newTop = 25; }
+          if (nearRight && nearBottom) { newLeft = 25; newTop = 25; }
+        }
       }
 
       newLeft = clamp(newLeft, 0, z.width - b.width);
-      newTop = clamp(newTop, 0, z.height - b.height);
+      newTop  = clamp(newTop,  0, z.height - b.height);
 
       noBtn.style.left = newLeft + "px";
-      noBtn.style.top = newTop + "px";
+      noBtn.style.top  = newTop  + "px";
       noBtn.style.transform = "none";
 
       growYes();
@@ -316,7 +243,7 @@
         (b.left + b.width / 2) - e.clientX,
         (b.top + b.height / 2) - e.clientY
       );
-      if (d < 200) moveNo(e.clientX, e.clientY);  // Больший радиус
+      if (d < 175) moveNo(e.clientX, e.clientY);
     });
 
     noBtn.addEventListener("click", e => {
@@ -325,7 +252,7 @@
       return false;
     });
 
-    /* ---------- YES CLICK ---------- */
+    /* Yes Click */
     yesBtn.addEventListener("click", () => {
       zone.style.display = "none";
       hint.style.display = "none";
@@ -334,9 +261,7 @@
       fullScreenConfetti();
 
       const video = document.querySelector('.fireworks');
-      if (video) {
-        video.play().catch(() => {});
-      }
+      if (video) video.play().catch(() => {});
     });
   </script>
 </body>
