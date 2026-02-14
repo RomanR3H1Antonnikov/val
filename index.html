@@ -262,7 +262,7 @@
       yesBtn.style.transform = `translateY(-50%) scale(${yesScale})`;
     }
 
-    /* ---------- NO BUTTON RUNS AWAY / TELEPORT ---------- */
+    /* ---------- NO BUTTON RUNS AWAY / MIRROR TELEPORT ---------- */
     function clamp(n, min, max) {
       return Math.max(min, Math.min(max, n));
     }
@@ -271,49 +271,62 @@
       const z = zone.getBoundingClientRect();
       const b = noBtn.getBoundingClientRect();
 
-      let dx = (b.left + b.width / 2) - px;
-      let dy = (b.top + b.height / 2) - py;
+      const currLeft = b.left - z.left;
+      const currTop  = b.top - z.top;
+      const centerX = currLeft + b.width / 2;
+      const centerY = currTop + b.height / 2;
+
+      let dx = centerX - px;
+      let dy = centerY - py;
       let mag = Math.hypot(dx, dy) || 1;
       dx /= mag;
       dy /= mag;
 
       // Обычное отталкивание
-      let newLeft = (b.left - z.left) + dx * 180;
-      let newTop  = (b.top - z.top) + dy * 180;
+      let newLeft = currLeft + dx * 180;
+      let newTop  = currTop + dy * 180;
 
-      // Проверяем, прижата ли кнопка к краю (в пределах 30 px)
+      // Порог близости к краю
       const edge = 30;
-      const currLeft = b.left - z.left;
-      const currTop  = b.top - z.top;
-      const isNearLeft   = currLeft <= edge;
-      const isNearRight  = currLeft >= z.width - b.width - edge;
-      const isNearTop    = currTop  <= edge;
-      const isNearBottom = currTop  >= z.height - b.height - edge;
 
-      // Если прижата к краю И курсор всё ещё близко → телепорт в противоположный угол
-      if ((isNearLeft || isNearRight || isNearTop || isNearBottom) && mag < 140) {
-        // Телепорт в противоположный угол
-        if (isNearLeft)   newLeft = z.width - b.width - 20;   // вправо
-        if (isNearRight)  newLeft = 20;                       // влево
-        if (isNearTop)    newTop  = z.height - b.height - 20; // вниз
-        if (isNearBottom) newTop  = 20;                       // вверх
+      // Проверяем, прижата ли кнопка к краю
+      const nearLeft   = currLeft <= edge;
+      const nearRight  = currLeft >= z.width - b.width - edge;
+      const nearTop    = currTop  <= edge;
+      const nearBottom = currTop  >= z.height - b.height - edge;
 
-        // Если прижата к двум краям сразу (угол) — выбираем диагонально противоположный
-        if (isNearLeft && isNearTop) {
-          newLeft = z.width - b.width - 20;
-          newTop  = z.height - b.height - 20;
+      // Телепорт ТОЛЬКО если кнопка прижата к краю И курсор приближается
+      if (mag < 140 && (nearLeft || nearRight || nearTop || nearBottom)) {
+        // Зеркальное отражение по центру зоны
+        if (nearLeft) {
+          newLeft = z.width - b.width - currLeft;  // зеркально справа
         }
-        if (isNearRight && isNearTop) {
-          newLeft = 20;
-          newTop  = z.height - b.height - 20;
+        if (nearRight) {
+          newLeft = z.width - b.width - (z.width - b.width - currLeft); // зеркально слева
         }
-        if (isNearLeft && isNearBottom) {
-          newLeft = z.width - b.width - 20;
-          newTop  = 20;
+        if (nearTop) {
+          newTop = z.height - b.height - currTop;  // зеркально снизу
         }
-        if (isNearRight && isNearBottom) {
-          newLeft = 20;
-          newTop  = 20;
+        if (nearBottom) {
+          newTop = z.height - b.height - (z.height - b.height - currTop); // зеркально сверху
+        }
+
+        // Если в углу — зеркально по диагонали (оба измерения)
+        if (nearLeft && nearTop) {
+          newLeft = z.width - b.width - currLeft;
+          newTop  = z.height - b.height - currTop;
+        }
+        if (nearRight && nearTop) {
+          newLeft = z.width - b.width - (z.width - b.width - currLeft);
+          newTop  = z.height - b.height - currTop;
+        }
+        if (nearLeft && nearBottom) {
+          newLeft = z.width - b.width - currLeft;
+          newTop  = z.height - b.height - (z.height - b.height - currTop);
+        }
+        if (nearRight && nearBottom) {
+          newLeft = z.width - b.width - (z.width - b.width - currLeft);
+          newTop  = z.height - b.height - (z.height - b.height - currTop);
         }
       }
 
